@@ -22,8 +22,8 @@ func setupAWSConf(profile string, region string) aws.Config {
 	return cfg
 }
 
-func getAttribute() []Data {
-	ec2Client := *ec2.NewFromConfig(setupAWSConf("awssam", "ap-southeast-3"))
+func getAttribute(profile string, region string) []Data {
+	ec2Client := *ec2.NewFromConfig(setupAWSConf(profile, region))
 	ec2GetIns, err := ec2Client.DescribeInstances(context.Background(), &ec2.DescribeInstancesInput{})
 	if err != nil {
 		panic(err)
@@ -52,8 +52,8 @@ func getAttribute() []Data {
 	return listData
 }
 
-func Ec2Collector() []Data {
-	listData := getAttribute()
+func Ec2Collector(profile string, region string) []Data {
+	listData := getAttribute(profile, region)
 	for _, v := range listData {
 		if v.PIC == "" {
 			v.PIC = "undefined"
