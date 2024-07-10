@@ -61,6 +61,7 @@ func Ec2Collector(profile string, region string) []Data {
 		if v.Priority == "" {
 			v.Priority = "low"
 		}
+		listData = append(listData, v)
 	}
 	return listData
 }
