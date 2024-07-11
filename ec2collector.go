@@ -6,12 +6,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	identityAWS "github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type Data struct {
-	Name     string
-	Priority string `default: "low"`
-	PIC      string `default: "undefined"`
+	Name      string
+	Priority  string
+	PIC       string
+	AccountId string
 }
 
 func setupAWSConf(profile string, region string) aws.Config {
@@ -22,9 +25,21 @@ func setupAWSConf(profile string, region string) aws.Config {
 	return cfg
 }
 
+// use this function to get all raw attributes of object in AWS (currently: EC2 & AWS Account Info)
 func getAttribute(profile string, region string) []Data {
-	ec2Client := *ec2.NewFromConfig(setupAWSConf(profile, region))
+
+	awsConf := setupAWSConf(profile, region)
+
+	// make Client Session for EC2 Instance
+	ec2Client := *ec2.NewFromConfig(awsConf)
 	ec2GetIns, err := ec2Client.DescribeInstances(context.Background(), &ec2.DescribeInstancesInput{})
+	if err != nil {
+		panic(err)
+	}
+
+	// make Client Session for Information AWS Account
+	infoAWSClient := identityAWS.NewFromConfig(awsConf)
+	res, err := infoAWSClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		panic(err)
 	}
@@ -34,6 +49,7 @@ func getAttribute(profile string, region string) []Data {
 	for _, ec2Instance := range ec2GetIns.Reservations {
 		// get the instance Describes (many)
 		var resourceData Data
+		resourceData.AccountId = *res.Account
 		for _, ec2InstanceDesc := range ec2Instance.Instances {
 			for _, tag := range ec2InstanceDesc.Tags {
 				if *tag.Key == "priority" {
@@ -52,6 +68,7 @@ func getAttribute(profile string, region string) []Data {
 	return listData
 }
 
+// use this function to fill empty value of attribute, fill it with default value
 func Ec2Collector(profile string, region string) []Data {
 	listData := getAttribute(profile, region)
 	for _, v := range listData {
