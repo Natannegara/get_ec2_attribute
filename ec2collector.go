@@ -58,7 +58,7 @@ func getAttribute(profile string, region string) []Data {
 				if *tag.Key == "Name" {
 					resourceData.Name = *tag.Value
 				}
-				if *tag.Key == "PIC" {
+				if *tag.Key == "pic" {
 					resourceData.PIC = *tag.Value
 				}
 			}
@@ -72,10 +72,10 @@ func getAttribute(profile string, region string) []Data {
 func Ec2Collector(profile string, region string) []Data {
 	listData := getAttribute(profile, region)
 	for _, v := range listData {
-		if v.PIC == "" {
+		if v.PIC == " " {
 			v.PIC = "undefined"
 		}
-		if v.Priority == "" {
+		if v.Priority == " " {
 			v.Priority = "low"
 		}
 		listData = append(listData, v)
