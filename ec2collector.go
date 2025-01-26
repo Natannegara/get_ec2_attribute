@@ -2,6 +2,7 @@ package ec2collector
 
 import (
 	"context"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -72,10 +73,10 @@ func getAttribute(profile string, region string) []Data {
 func Ec2Collector(profile string, region string) []Data {
 	listData := getAttribute(profile, region)
 	for _, v := range listData {
-		if v.PIC == " " {
+		if strings.TrimSpace(v.PIC) == "" {
 			v.PIC = "undefined"
 		}
-		if v.Priority == " " {
+		if strings.TrimSpace(v.Priority) == "" {
 			v.Priority = "low"
 		}
 		listData = append(listData, v)
