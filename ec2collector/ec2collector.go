@@ -12,10 +12,12 @@ import (
 )
 
 type Data struct {
-	Name      string
-	Priority  string
-	PIC       string
-	AccountId string
+	Name            string
+	Priority        string
+	PIC             string
+	AccountId       string
+	BackupRetention string
+	BackupStatus    string
 }
 
 func setupAWSConf(profile string, region string) aws.Config {
@@ -62,6 +64,12 @@ func getAttribute(profile string, region string) []Data {
 				if *tag.Key == "pic" {
 					resourceData.PIC = *tag.Value
 				}
+				if *tag.Key == "backup_retention" {
+					resourceData.BackupRetention = *tag.Value
+				}
+				if *tag.Key == "backup_status" {
+					resourceData.BackupStatus = *tag.Value
+				}
 			}
 		}
 		listData = append(listData, resourceData)
@@ -78,6 +86,12 @@ func Ec2Collector(profile string, region string) []Data {
 		}
 		if strings.TrimSpace(v.Priority) == "" {
 			v.Priority = "low"
+		}
+		if strings.TrimSpace(v.BackupRetention) == "" {
+			v.BackupRetention = "false"
+		}
+		if strings.TrimSpace(v.BackupStatus) == "" {
+			v.BackupStatus = "false"
 		}
 		listData = append(listData, v)
 	}
