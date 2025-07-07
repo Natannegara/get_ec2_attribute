@@ -13,6 +13,7 @@ import (
 
 type Data struct {
 	Name            string
+	CreatedTime     string
 	Priority        string
 	PIC             string
 	AccountId       string
@@ -54,6 +55,12 @@ func getAttribute(profile string, region string) []Data {
 		var resourceData Data
 		resourceData.AccountId = *res.Account
 		for _, ec2InstanceDesc := range ec2Instance.Instances {
+
+			for _, ni := range ec2InstanceDesc.NetworkInterfaces {
+				rawTime := *ni.Attachment.AttachTime
+				resourceData.CreatedTime = rawTime.Format("02-01-2006")
+			}
+
 			for _, tag := range ec2InstanceDesc.Tags {
 				if *tag.Key == "priority" {
 					resourceData.Priority = *tag.Value
