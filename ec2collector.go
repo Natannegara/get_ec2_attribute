@@ -104,3 +104,5 @@ func Ec2Collector(profile string, region string) []Data {
 	}
 	return listData
 }
+
+// test
