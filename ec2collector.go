@@ -19,6 +19,7 @@ type Data struct {
 	AccountId       string
 	BackupRetention string
 	BackupStatus    string
+	Env             string
 }
 
 func setupAWSConf(profile string, region string) aws.Config {
@@ -76,6 +77,9 @@ func getAttribute(profile string, region string) []Data {
 				}
 				if *tag.Key == "backup_status" {
 					resourceData.BackupStatus = *tag.Value
+				}
+				if strings.ToLower(*tag.Key) == "environment" || strings.ToLower(*tag.Key) == "env" {
+					resourceData.Env = *tag.Value
 				}
 			}
 		}
